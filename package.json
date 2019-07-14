@@ -1,0 +1,9 @@
+{
+    "name": "easy-template",
+    "version": "0.0.1",
+    "description": "javascript template tool",
+    "main": "src/index.js",
+    "repository": "https://github.com/leslieSie/easy-template.git",
+    "author": "leslieSie <18826220848@163.com>",
+    "license": "MIT"
+}

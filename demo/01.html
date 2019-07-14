@@ -1,0 +1,43 @@
+<html>
+
+<body></body>
+
+</html>
+<script type="text/template" id="template">
+    <div>{{name}}</div>
+    <div>{{info.age}}</div>
+</script>
+<script>
+    var data = {
+        name: 'leslie',
+        info: {
+            age: 25
+        }
+    }
+    let dom = document.querySelector('#template').innerHTML;
+
+    function compile(v_dom) {
+        let regex = /{{([^{}]*)?}}/g;
+        // pre compile
+        let preCompile = v_dom.replace(/[\n\r\t]/g, '');
+        preCompile = '\"' + preCompile;
+        while (match = regex.exec(preCompile)) {
+            let filed_regexp = new RegExp(match[0], 'g');
+            preCompile = preCompile.replace(filed_regexp, '\"+this.' + match[1] + '+\"');
+        }
+        preCompile += '\"';
+        return preCompile;
+    }
+
+    function render(tpl, data) {
+        let render_func = `return ${tpl}`;
+        let temp = new Function(render_func).call(data);
+        return temp;
+    }
+
+    let compile_template = compile(dom);
+    let content = render(compile_template, data);
+    // 内容挂載
+
+    document.body.innerHTML = content;
+</script>
