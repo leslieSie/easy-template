@@ -4,15 +4,21 @@
 
 </html>
 <script type="text/template" id="template">
-    <div style="color:red">{{name}}</div>
+    <div style="color:red;font-size:20px;">{{name}}</div>
     <div>{{info.age}}</div>
+    <div v-for="item in array">
+        <span></span>
+    </div>
+    <div v-if=""></div>
 </script>
 <script>
     var data = {
+        status: true,
         name: 'leslie',
         info: {
             age: 25
-        }
+        },
+        array: ['demo1', 'test']
     }
     let dom = document.querySelector('#template').innerHTML;
 
