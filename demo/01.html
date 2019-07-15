@@ -4,7 +4,7 @@
 
 </html>
 <script type="text/template" id="template">
-    <div>{{name}}</div>
+    <div style="color:red">{{name}}</div>
     <div>{{info.age}}</div>
 </script>
 <script>
@@ -19,7 +19,10 @@
     function compile(v_dom) {
         let regex = /{{([^{}]*)?}}/g;
         // pre compile
-        let preCompile = v_dom.replace(/[\n\r\t]/g, '');
+        let preCompile = v_dom.replace(/[\n\r\t]/g, '')
+            .replace(/("|')/g, function(s0, s1) {
+                return '\\' + s1;
+            });
         preCompile = '\"' + preCompile;
         while (match = regex.exec(preCompile)) {
             let filed_regexp = new RegExp(match[0], 'g');
