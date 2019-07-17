@@ -1,41 +1,54 @@
 <html>
 
-<body></body>
+<body>
+    <!-- -->
+</body>
 
 </html>
 <script type="text/template" id="template">
-    <div style="color:red;font-size:20px;">{{name}}</div>
-    <div>{{info.age}}</div>
-    <div v-for="item in array">
+    <div style="color:red;font-size:20px;">{{ name }}</div>
+    <div>{{ info.age.sex }}</div>
+    <div></div>
+    <!-- <div v-for="item in array">
         <span></span>
     </div>
-    <div v-if=""></div>
+    <div v-if=""></div> -->
 </script>
 <script>
     var data = {
         status: true,
         name: 'leslie',
         info: {
-            age: 25
+            age: {
+                sex: 'man'
+            }
         },
         array: ['demo1', 'test']
     }
     let dom = document.querySelector('#template').innerHTML;
 
     function compile(v_dom) {
-        let regex = /{{([^{}]*)?}}/g;
-        // pre compile
-        let preCompile = v_dom.replace(/[\n\r\t]/g, '')
-            .replace(/("|')/g, function(s0, s1) {
+        return new Promise((resolve, reject) => {
+            // clear comments and change tab,new line to space
+            let pre_v_dom = v_dom.replace(/[\n\r\t]/g, '').replace(/<!--.*-->/g, "");
+            resolve(pre_v_dom);
+
+        }).then(pre_v_dom => {
+            // transform code
+            return pre_v_dom.replace(/("|')/g, function (s0, s1) {
                 return '\\' + s1;
             });
-        preCompile = '\"' + preCompile;
-        while (match = regex.exec(preCompile)) {
-            let filed_regexp = new RegExp(match[0], 'g');
-            preCompile = preCompile.replace(filed_regexp, '\"+this.' + match[1] + '+\"');
-        }
-        preCompile += '\"';
-        return preCompile;
+        }).then(pre_v_dom => {
+            // preCompile
+            let regex = /{{([^{}]*)?}}/g;
+            pre_v_dom = '\"' + pre_v_dom;
+            while (match = regex.exec(pre_v_dom)) {
+                let filed_regexp = new RegExp(match[0], 'g');
+                pre_v_dom = pre_v_dom.replace(filed_regexp, '\"+this.' + match[1] + '+\"');
+            }
+            pre_v_dom += '\"';
+            return pre_v_dom;
+        });
     }
 
     function render(tpl, data) {
@@ -45,8 +58,12 @@
     }
 
     let compile_template = compile(dom);
-    let content = render(compile_template, data);
+    compile_template.then(template => {
+        let content = render(template, data);
+        document.body.innerHTML = content;
+    })
+
     // 内容挂載
 
-    document.body.innerHTML = content;
+
 </script>
