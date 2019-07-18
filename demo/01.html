@@ -6,7 +6,7 @@
 
 </html>
 <script type="text/template" id="template">
-    <div :style="{fontSize:fontSize}">{{ name }}</div>
+    <div :style="{ fontSize : fontSize,color:color }">{{ name }}</div>
     <div>{{ info.age.sex }}</div>
     <!-- <div></div> -->
     <!-- <div v-for="item in array">
@@ -66,9 +66,12 @@
             let key = clearSpace(temp[0]);
             let value = clearSpace(temp[1]);
             let execKey = /[A-Z]/g.exec(key);
-            let key2LowerCase = replaceAt(execKey.index, key, `-${execKey[0].toLowerCase()}`);
+            let key2LowerCase = '';
+            if (execKey) {
+                key2LowerCase = replaceAt(execKey.index, key, `-${execKey[0].toLowerCase()}`);
+            }
             return {
-                key: String(key2LowerCase),
+                key: String(key2LowerCase) || String(key),
                 value: String(value)
             }
         });
