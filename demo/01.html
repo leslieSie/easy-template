@@ -6,9 +6,9 @@
 
 </html>
 <script type="text/template" id="template">
-    <div :style="{display:dis}">{{ name }}</div>
+    <div :style="{color:color}">{{ name }}</div>
     <div>{{ info.age.sex }}</div>
-    <div></div>
+    <!-- <div></div> -->
     <!-- <div v-for="item in array">
         <span></span>
     </div>
@@ -19,7 +19,8 @@
     var data = {
         status: true,
         name: 'leslie',
-        dis: 'none',
+        // dis: 'none',
+        color: 'red',
         info: {
             age: {
                 sex: 'man'
@@ -41,18 +42,38 @@
         }
     }
 
+    function clearSpace(str) {
+        return str.replace(/\s+/g, "");
+    }
+
     function __computedObjectString(str) {
         let __ObjectString__ = '';
-        let value2Str = str.replace(/^{\s*\w+:(\w+)?\s*}$/g, '"s1"');
-        debugger;
+        let __cache__ = '';
+        let __tempArray__ = [];
+        let __regex__ = /\s*\w+\s*:\s*(\w+)\s*(?=[,}])\s*/g;
+        let match = str.match(__regex__);
+        let __returnMatch__ = match.map(item => {
+            let temp = item.split(':');
+            let key = clearSpace(temp[0]);
+            let value = clearSpace(temp[1]);
+            return {
+                key: key,
+                value: String(value)
+            }
+        });
+        __returnMatch__.forEach(item => {
+            __tempArray__.push(item.key + ":\"+this." + item.value);
+        });
+        __ObjectString__ = '\"' + __tempArray__.join('+\";');
+        return __ObjectString__;
     }
 
     function compile(v_dom) { // open
         return new Promise((resolve, reject) => {
-                // clear comments and change tab,new line to space
-                let pre_v_dom = v_dom.replace(/[\n\r\t]/g, '').replace(/<!--.*-->/g, "");
-                resolve(pre_v_dom);
-            })
+            // clear comments and change tab,new line to space
+            let pre_v_dom = v_dom.replace(/[\n\r\t]/g, '').replace(/<!--.*-->/g, "");
+            resolve(pre_v_dom);
+        })
             .then(pre_v_dom => {
                 // Deal Template Property
                 return pre_v_dom.replace(/(v-bind)?(:\w+)=["']\s*(.+)\s*["']/g, (s0, s1, s2, s3) => {
@@ -60,20 +81,21 @@
                     let dataType = __dynamicPropertyType(s3);
                     switch (dataType) {
                         case 'objectString':
-                            __computedObjectString(s3);
-                            // new Function(s3).apply(data);
+                            let toString = __computedObjectString(s3);
+                            let returnString = new Function(`return ${toString}`).apply(data);
+                            return `${d2}=${returnString}`;
                             break;
 
                         default:
                             break;
                     }
-                    return `${d2}`;
+
                 });
 
             })
             .then(pre_v_dom => {
                 // transform code
-                return pre_v_dom.replace(/("|')/g, function(s0, s1) {
+                return pre_v_dom.replace(/("|')/g, function (s0, s1) {
                     return '\\' + s1;
                 });
             })
