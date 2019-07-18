@@ -6,7 +6,7 @@
 
 </html>
 <script type="text/template" id="template">
-    <div :style="{color:color}">{{ name }}</div>
+    <div :style="{fontSize:fontSize}">{{ name }}</div>
     <div>{{ info.age.sex }}</div>
     <!-- <div></div> -->
     <!-- <div v-for="item in array">
@@ -21,6 +21,7 @@
         name: 'leslie',
         // dis: 'none',
         color: 'red',
+        fontSize: '30px',
         info: {
             age: {
                 sex: 'man'
@@ -42,11 +43,19 @@
         }
     }
 
+    // clear all space on string
     function clearSpace(str) {
         return str.replace(/\s+/g, "");
     }
 
-    function __computedObjectString(str) {
+    // replace index char function
+    function replaceAt(index, originStr, replaceStr) {
+        let __beginStr__ = originStr.slice(0, parseInt(index));
+        let __endStr__ = originStr.slice(parseInt(index) + 1, originStr.length);
+        return `${__beginStr__}${replaceStr}${__endStr__}`;
+    }
+
+    function __getObjectString(str) {
         let __ObjectString__ = '';
         let __cache__ = '';
         let __tempArray__ = [];
@@ -56,8 +65,10 @@
             let temp = item.split(':');
             let key = clearSpace(temp[0]);
             let value = clearSpace(temp[1]);
+            let execKey = /[A-Z]/g.exec(key);
+            let key2LowerCase = replaceAt(execKey.index, key, `-${execKey[0].toLowerCase()}`);
             return {
-                key: key,
+                key: String(key2LowerCase),
                 value: String(value)
             }
         });
@@ -81,12 +92,12 @@
                     let dataType = __dynamicPropertyType(s3);
                     switch (dataType) {
                         case 'objectString':
-                            let toString = __computedObjectString(s3);
+                            let toString = __getObjectString(s3);
                             let returnString = new Function(`return ${toString}`).apply(data);
                             return `${d2}=${returnString}`;
                             break;
-
                         default:
+
                             break;
                     }
 
