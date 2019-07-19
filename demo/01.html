@@ -6,7 +6,7 @@
 
 </html>
 <script type="text/template" id="template">
-    <div :style="{ fontSize : fontSize,color:custom.color }">{{ name }}</div>
+    <div :style="{ fontSize : fontSize+'px',color:custom.color }">{{ name }}</div>
     <div>{{ info.age.sex }}</div>
     <!-- <div></div> -->
     <!-- <div v-for="item in array">
@@ -23,7 +23,7 @@
         custom: {
             color: "red"
         },
-        fontSize: "30px",
+        fontSize: "30",
         info: {
             age: {
                 sex: "man"
@@ -92,10 +92,11 @@
     function compile(v_dom) {
         // open
         return new Promise((resolve, reject) => {
-                // clear comments and change tab,new line to space
-                let pre_v_dom = v_dom.replace(/[\n\r\t]/g, "").replace(/<!--.*-->/g, "");
-                resolve(pre_v_dom);
-            })
+            // clear comments and change tab,new line to space
+            let pre_v_dom = v_dom.replace(/[\n\r\t]/g, "").replace(/<!--.*-->/g, "");
+            resolve(pre_v_dom);
+        })
+           
             .then(pre_v_dom => {
                 // Deal Template Property
                 return pre_v_dom.replace(
@@ -118,11 +119,17 @@
                 );
             })
             .then(pre_v_dom => {
-                // transform code
-                return pre_v_dom.replace(/("|')/g, function(s0, s1) {
-                    return "\\" + s1;
+                // change all double quote to single quote
+                return pre_v_dom.replace(/(")/g, (s0, s1) => {
+                    return `\\`;
                 });
             })
+           /*  .then(pre_v_dom => {
+                // transform code
+                return pre_v_dom.replace(/("|')/g, function (s0, s1) {
+                    return "\\" + s1;
+                });
+            }) */
             .then(pre_v_dom => {
                 // preCompile
                 let regex = /{{([^{}]*)?}}/g;
